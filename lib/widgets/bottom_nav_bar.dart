@@ -1,4 +1,4 @@
-import 'package:ecosort/colors.dart';
+import 'package:ecosort/constants/colors.dart';
 import 'package:flutter/material.dart';
 
 class BottomNavBar extends StatelessWidget {
