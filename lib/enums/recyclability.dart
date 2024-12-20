@@ -2,15 +2,15 @@ import 'dart:ui';
 
 enum Recyclability {
   recyclable(
-    "good",
+    "Good",
     Color(0xFF4CAF50),
   ),
   nonRecyclable(
-    "bad",
+    "Bad",
     Color(0xFFF44336),
   ),
   unknown(
-    "unknown",
+    "Unknown",
     Color(0xFF9E9E9E),
   );
 
