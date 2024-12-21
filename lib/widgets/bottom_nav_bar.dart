@@ -27,9 +27,7 @@ class BottomNavBar extends StatelessWidget {
           icon: Icon(Icons.map),
           label: 'Map',
         ),
-        BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Assist'),
+        BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Assist'),
       ],
       currentIndex: selectedIndex,
       selectedItemColor: AppColors.primaryColor,
