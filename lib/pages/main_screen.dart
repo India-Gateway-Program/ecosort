@@ -1,10 +1,12 @@
 import 'package:ecosort/constants/borders.dart';
 import 'package:ecosort/constants/colors.dart';
+import 'package:ecosort/pages/history_screen.dart';
+import 'package:ecosort/pages/map_screen.dart';
 import 'package:ecosort/widgets/bottom_nav_bar.dart';
 import 'package:ecosort/widgets/history_list_tile.dart';
 import 'package:flutter/material.dart';
 
-import 'enums/recyclability.dart';
+import '../enums/recyclability.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,58 +18,47 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primaryColor),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const HomePage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _HomePageState extends State<HomePage> {
+  int _selectedIndex = 0;
 
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
+  final List<Widget> _pages = [
+    HistoryScreen(),
+    MapScreen(),
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      body: ListView(
-        children: [
-          HistoryTile(
-            recyclability: Recyclability.recyclable,
-            materialDescription: 'Aluminum',
-          ),
-        ],
-      ),
+      body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavBar(
         selectedIndex: 0,
-        onItemTapped: (int) {},
+        onItemTapped: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
       ),
       floatingActionButton: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           TextButton.icon(
-            onPressed: _incrementCounter,
+            onPressed: () {},
             icon: const Icon(
               Icons.qr_code_scanner,
               color: Colors.white,
