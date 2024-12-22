@@ -2,14 +2,16 @@ import 'package:ecosort/constants/borders.dart';
 import 'package:ecosort/constants/colors.dart';
 import 'package:ecosort/pages/history_screen.dart';
 import 'package:ecosort/pages/map_screen.dart';
+import 'package:ecosort/pages/scan_screen.dart';
 import 'package:ecosort/widgets/bottom_nav_bar.dart';
-import 'package:ecosort/widgets/history_list_tile.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../enums/recyclability.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const ProviderScope(
+    child: MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -47,33 +49,40 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavBar(
-        selectedIndex: 0,
+        selectedIndex: _selectedIndex,
         onItemTapped: (index) {
           setState(() {
             _selectedIndex = index;
           });
         },
       ),
-      floatingActionButton: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          TextButton.icon(
-            onPressed: () {},
-            icon: const Icon(
-              Icons.qr_code_scanner,
-              color: Colors.white,
-            ),
-            label: Text("Scan", style: TextStyle(color: Colors.white)),
-            style: TextButton.styleFrom(
-              backgroundColor: AppColors.primaryColor,
-              shape: RoundedRectangleBorder(
-                borderRadius: AppBorders.small,
-              ),
-              padding: const EdgeInsets.all(15),
-            ),
-          )
-        ],
-      ),
+      floatingActionButton: _selectedIndex == 0
+          ? Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton.icon(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => ScanScreen()),
+                    );
+                  },
+                  icon: const Icon(
+                    Icons.qr_code_scanner,
+                    color: Colors.white,
+                  ),
+                  label: Text("Scan", style: TextStyle(color: Colors.white)),
+                  style: TextButton.styleFrom(
+                    backgroundColor: AppColors.primaryColor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: AppBorders.small,
+                    ),
+                    padding: const EdgeInsets.all(15),
+                  ),
+                )
+              ],
+            )
+          : null,
     );
   }
 }
