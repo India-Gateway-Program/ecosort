@@ -39,6 +39,7 @@ dependencies:
   location: ^5.0.0
   flutter_map_location_marker: ^9.1.1
   flutter_riverpod: ^2.6.1
+  http: ^1.2.2
 
 
 dev_dependencies:
