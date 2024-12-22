@@ -25,6 +25,8 @@ class LocationNotifier extends StateNotifier<LocationData> {
   final Location _location = Location();
 
   Future<void> getLocation() async {
+    _location.changeSettings(accuracy: LocationAccuracy.balanced);
+
     state = LocationData(
         isLoading: true, latitude: state.latitude, longitude: state.longitude);
 
