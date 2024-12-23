@@ -15,22 +15,37 @@ class MapScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final locationState = ref.watch(locationProvider);
-
-    double latitude = 12.9716;
-    double longitude = 77.5946;
-    double radius = 10500;
-
-    if (locationState.latitude != null && locationState.longitude != null) {
-      latitude = locationState.latitude!;
-      longitude = locationState.longitude!;
-    }
-
     final recyclingPlaces = ref.watch(recyclingPlacesProvider);
 
-    ref.listen<LocationData?>(locationProvider, (previous, next) {
-      if (next != null && next.latitude != null && next.longitude != null) {
-        mapController.move(LatLng(next.latitude!, next.longitude!), 15);
-      }
+    double latitude = 12.9716; // Default latitude
+    double longitude = 77.5946; // Default longitude
+
+    locationState.when(
+      data: (locationData) {
+        if (locationData.latitude != null && locationData.longitude != null) {
+          latitude = locationData.latitude!;
+          longitude = locationData.longitude!;
+        }
+      },
+      loading: () {
+        // TODO: Show a loading indicator
+      },
+      error: (error, stackTrace) {
+        // TODO: Show an error message
+      },
+    );
+
+    ref.listen<AsyncValue<LocationData>>(locationProvider, (previous, next) {
+      next.when(
+        data: (locationData) {
+          if (locationData.latitude != null && locationData.longitude != null) {
+            mapController.move(
+                LatLng(locationData.latitude!, locationData.longitude!), 15);
+          }
+        },
+        loading: () {},
+        error: (error, stack) {},
+      );
     });
 
     return FlutterMap(
@@ -50,7 +65,7 @@ class MapScreen extends ConsumerWidget {
               markers: places.map((place) {
                 return Marker(
                   point: LatLng(place.lat, place.lon),
-                  child: Icon(
+                  child: const Icon(
                     Icons.recycling,
                     color: Colors.green,
                   ),
@@ -61,7 +76,7 @@ class MapScreen extends ConsumerWidget {
           loading: () => const Center(
             child: CircularProgressIndicator(),
           ),
-          error: (error, stack) => Center(child: Text('Fehler: $error')),
+          error: (error, stack) => Center(child: Text('Error: $error')),
         ),
         Positioned(
           bottom: 20,
@@ -69,13 +84,24 @@ class MapScreen extends ConsumerWidget {
           child: FloatingActionButton(
             backgroundColor: AppColors.primaryColor,
             onPressed: () async {
-              await ref.read(locationProvider.notifier).getLocation();
-            }, // (external)
-            child: locationState.isLoading
-                ? const CircularProgressIndicator(
-                    backgroundColor: Colors.white,
-                  )
-                : const Icon(Icons.my_location, color: Colors.white),
+              final locationState = await ref.read(locationProvider.future);
+
+              if (locationState.latitude != null &&
+                  locationState.longitude != null) {
+                mapController.move(
+                    LatLng(locationState.latitude!, locationState.longitude!),
+                    15);
+              } else {
+              // TODO: Show an error message
+              }
+            },
+            child: locationState.maybeWhen(
+              data: (locationData) =>
+                  const Icon(Icons.my_location, color: Colors.white),
+              orElse: () => const CircularProgressIndicator(
+                backgroundColor: Colors.white,
+              ),
+            ),
           ),
         ),
       ],

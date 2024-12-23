@@ -1,11 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:location/location.dart';
 
-final locationProvider =
-    StateNotifierProvider<LocationNotifier, LocationData>((ref) {
-  return LocationNotifier();
-});
-
 class LocationData {
   final bool isLoading;
   final double? latitude;
@@ -18,54 +13,36 @@ class LocationData {
   });
 }
 
-class LocationNotifier extends StateNotifier<LocationData> {
-  LocationNotifier()
-      : super(LocationData(isLoading: false, latitude: null, longitude: null));
+final locationProvider = FutureProvider<LocationData>((ref) async {
+  final Location location = Location();
+  location.changeSettings(accuracy: LocationAccuracy.balanced);
 
-  final Location _location = Location();
+  LocationData state = LocationData(isLoading: true);
 
-  Future<void> getLocation() async {
-    _location.changeSettings(accuracy: LocationAccuracy.balanced);
-
-    state = LocationData(
-        isLoading: true, latitude: state.latitude, longitude: state.longitude);
-
-    bool serviceEnabled = await _location.serviceEnabled();
+  bool serviceEnabled = await location.serviceEnabled();
+  if (!serviceEnabled) {
+    serviceEnabled = await location.requestService();
     if (!serviceEnabled) {
-      serviceEnabled = await _location.requestService();
-      if (!serviceEnabled) {
-        state = LocationData(
-            isLoading: false,
-            latitude: state.latitude,
-            longitude: state.longitude);
-        return;
-      }
-    }
-
-    PermissionStatus permissionGranted = await _location.hasPermission();
-    if (permissionGranted == PermissionStatus.denied) {
-      permissionGranted = await _location.requestPermission();
-      if (permissionGranted != PermissionStatus.granted) {
-        state = LocationData(
-            isLoading: false,
-            latitude: state.latitude,
-            longitude: state.longitude);
-        return;
-      }
-    }
-
-    try {
-      final locationData = await _location.getLocation();
-      state = LocationData(
-        isLoading: false,
-        latitude: locationData.latitude,
-        longitude: locationData.longitude,
-      );
-    } catch (e) {
-      state = LocationData(
-          isLoading: false,
-          latitude: state.latitude,
-          longitude: state.longitude);
+      return LocationData(isLoading: false);
     }
   }
-}
+
+  PermissionStatus permissionGranted = await location.hasPermission();
+  if (permissionGranted == PermissionStatus.denied) {
+    permissionGranted = await location.requestPermission();
+    if (permissionGranted != PermissionStatus.granted) {
+      return LocationData(isLoading: false);
+    }
+  }
+
+  try {
+    final locationData = await location.getLocation();
+    return LocationData(
+      isLoading: false,
+      latitude: locationData.latitude,
+      longitude: locationData.longitude,
+    );
+  } catch (e) {
+    return LocationData(isLoading: false);
+  }
+});

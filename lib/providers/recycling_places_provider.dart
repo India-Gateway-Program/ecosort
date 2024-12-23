@@ -26,35 +26,47 @@ class RecyclingPlace {
 
 final recyclingPlacesProvider = FutureProvider<List<RecyclingPlace>>(
   (ref) async {
-    try {
+    final locationAsyncValue = ref.watch(locationProvider);
 
-      final location = ref.watch(locationProvider);
-      double? latitude = location.latitude;
-      double? longitude = location.longitude;
-      double radius = 10500;
-
-      final String overpassUrl = 'http://overpass-api.de/api/interpreter';
-      final String query =
-          '[out:json];(node["amenity"="recycling"](around:$radius,$latitude,$longitude););out;';
-
-      final response = await http
-          .get(Uri.parse('$overpassUrl?data=${Uri.encodeComponent(query)}'));
-
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        List<RecyclingPlace> places = [];
-        for (var element in data['elements']) {
-          if (element['lat'] != null && element['lon'] != null) {
-            places.add(RecyclingPlace.fromJson(element));
-          }
+    return locationAsyncValue.when(
+      data: (locationData) async {
+        if (locationData.latitude == null || locationData.longitude == null) {
+          throw Exception('Location data is missing.');
         }
-        return places;
-      } else {
-        throw Exception('Failed to load recycling places');
-      }
-    } catch (e) {
-      // TODO: Handle error
-      return [];
-    }
+
+        double latitude = locationData.latitude!;
+        double longitude = locationData.longitude!;
+        double radius = 10500;
+
+        final String overpassUrl = 'http://overpass-api.de/api/interpreter';
+        final String query =
+            '[out:json];(node["amenity"="recycling"](around:$radius,$latitude,$longitude););out;';
+
+        try {
+          final response = await http.get(
+            Uri.parse('$overpassUrl?data=${Uri.encodeComponent(query)}'),
+          );
+
+          if (response.statusCode == 200) {
+            final data = json.decode(response.body);
+            List<RecyclingPlace> places = [];
+            for (var element in data['elements']) {
+              if (element['lat'] != null && element['lon'] != null) {
+                places.add(RecyclingPlace.fromJson(element));
+              }
+            }
+            return places;
+          } else {
+            throw Exception('Failed to load recycling places from the API.');
+          }
+        } catch (e) {
+          throw Exception('Error while fetching data: $e');
+        }
+      },
+      loading: () async => [],
+      error: (error, stackTrace) async {
+        throw Exception('Error while loading location data: $error');
+      },
+    );
   },
 );
