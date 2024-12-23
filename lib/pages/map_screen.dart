@@ -1,5 +1,6 @@
 import 'package:ecosort/constants/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -27,26 +28,11 @@ class MapScreen extends ConsumerWidget {
           longitude = locationData.longitude!;
         }
       },
-      loading: () {
-        // TODO: Show a loading indicator
-      },
+      loading: () {},
       error: (error, stackTrace) {
         // TODO: Show an error message
       },
     );
-
-    ref.listen<AsyncValue<LocationData>>(locationProvider, (previous, next) {
-      next.when(
-        data: (locationData) {
-          if (locationData.latitude != null && locationData.longitude != null) {
-            mapController.move(
-                LatLng(locationData.latitude!, locationData.longitude!), 15);
-          }
-        },
-        loading: () {},
-        error: (error, stack) {},
-      );
-    });
 
     return FlutterMap(
       mapController: mapController,
@@ -58,7 +44,17 @@ class MapScreen extends ConsumerWidget {
         TileLayer(
           urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
         ),
-        CurrentLocationLayer(),
+        locationState.when(
+          data: (locationData) {
+            return CurrentLocationLayer();
+          },
+          loading: () {
+            return Container();
+          },
+          error: (error, stack) {
+            return Container();
+          },
+        ),
         recyclingPlaces.when(
           data: (places) {
             return MarkerLayer(
@@ -76,7 +72,9 @@ class MapScreen extends ConsumerWidget {
           loading: () => const Center(
             child: CircularProgressIndicator(),
           ),
-          error: (error, stack) => Center(child: Text('Error: $error')),
+          error: (error, stack) {
+            return Container();
+          },
         ),
         Positioned(
           bottom: 20,
@@ -84,24 +82,37 @@ class MapScreen extends ConsumerWidget {
           child: FloatingActionButton(
             backgroundColor: AppColors.primaryColor,
             onPressed: () async {
-              final locationState = await ref.read(locationProvider.future);
-
-              if (locationState.latitude != null &&
-                  locationState.longitude != null) {
-                mapController.move(
-                    LatLng(locationState.latitude!, locationState.longitude!),
-                    15);
-              } else {
-              // TODO: Show an error message
+              try {
+                final locationState = await ref.read(locationProvider.future);
+                if (locationState.latitude != null &&
+                    locationState.longitude != null) {
+                  mapController.move(
+                      LatLng(locationState.latitude!, locationState.longitude!),
+                      15);
+                } else {
+                  // TODO: Show an error message
+                }
+              } catch (e) {
+                SchedulerBinding.instance.addPostFrameCallback((_) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(e.toString()),
+                      backgroundColor: Colors.red,
+                      duration: Duration(seconds: 3),
+                    ),
+                  );
+                });
               }
             },
-            child: locationState.maybeWhen(
-              data: (locationData) =>
-                  const Icon(Icons.my_location, color: Colors.white),
-              orElse: () => const CircularProgressIndicator(
-                backgroundColor: Colors.white,
-              ),
-            ),
+            child: locationState.when(
+                data: (locationData) =>
+                    const Icon(Icons.my_location, color: Colors.white),
+                loading: () {
+                  return Icon(Icons.location_searching, color: Colors.white);
+                },
+                error: (error, stack) {
+                  return const Icon(Icons.location_disabled, color: Colors.red);
+                }),
           ),
         ),
       ],

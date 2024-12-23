@@ -30,19 +30,19 @@ final recyclingPlacesProvider = FutureProvider<List<RecyclingPlace>>(
 
     return locationAsyncValue.when(
       data: (locationData) async {
-        if (locationData.latitude == null || locationData.longitude == null) {
-          throw Exception('Location data is missing.');
-        }
-
-        double latitude = locationData.latitude!;
-        double longitude = locationData.longitude!;
-        double radius = 10500;
-
-        final String overpassUrl = 'http://overpass-api.de/api/interpreter';
-        final String query =
-            '[out:json];(node["amenity"="recycling"](around:$radius,$latitude,$longitude););out;';
-
         try {
+          if (locationData.latitude == null || locationData.longitude == null) {
+            throw Exception('Location data is missing.');
+          }
+
+          double latitude = locationData.latitude!;
+          double longitude = locationData.longitude!;
+          double radius = 10500;
+
+          final String overpassUrl = 'http://overpass-api.de/api/interpreter';
+          final String query =
+              '[out:json];(node["amenity"="recycling"](around:$radius,$latitude,$longitude););out;';
+
           final response = await http.get(
             Uri.parse('$overpassUrl?data=${Uri.encodeComponent(query)}'),
           );

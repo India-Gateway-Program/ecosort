@@ -1,3 +1,4 @@
+import 'package:ecosort/exceptions/location_exception.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:location/location.dart';
 
@@ -14,28 +15,23 @@ class LocationData {
 }
 
 final locationProvider = FutureProvider<LocationData>((ref) async {
-  final Location location = Location();
-  location.changeSettings(accuracy: LocationAccuracy.balanced);
-
-  LocationData state = LocationData(isLoading: true);
-
-  bool serviceEnabled = await location.serviceEnabled();
-  if (!serviceEnabled) {
-    serviceEnabled = await location.requestService();
-    if (!serviceEnabled) {
-      return LocationData(isLoading: false);
-    }
-  }
-
-  PermissionStatus permissionGranted = await location.hasPermission();
-  if (permissionGranted == PermissionStatus.denied) {
-    permissionGranted = await location.requestPermission();
-    if (permissionGranted != PermissionStatus.granted) {
-      return LocationData(isLoading: false);
-    }
-  }
-
   try {
+    final Location location = Location();
+    location.changeSettings(accuracy: LocationAccuracy.balanced);
+
+    bool serviceEnabled = await location.serviceEnabled();
+    if (!serviceEnabled) {
+      throw LocationException('Location service is disabled.');
+    }
+
+    PermissionStatus permissionGranted = await location.hasPermission();
+    if (permissionGranted == PermissionStatus.denied) {
+      permissionGranted = await location.requestPermission();
+      if (permissionGranted != PermissionStatus.granted) {
+        throw LocationException('Location permission is required.');
+      }
+    }
+
     final locationData = await location.getLocation();
     return LocationData(
       isLoading: false,
@@ -43,6 +39,6 @@ final locationProvider = FutureProvider<LocationData>((ref) async {
       longitude: locationData.longitude,
     );
   } catch (e) {
-    return LocationData(isLoading: false);
+    throw LocationException(e.toString());
   }
 });
