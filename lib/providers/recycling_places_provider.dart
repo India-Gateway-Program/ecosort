@@ -41,7 +41,7 @@ final recyclingPlacesProvider = FutureProvider<List<RecyclingPlace>>(
 
           final String overpassUrl = 'http://overpass-api.de/api/interpreter';
           final String query =
-              '[out:json];(node["amenity"="recycling"](around:$radius,$latitude,$longitude););out;';
+              '''[out:json];node["amenity"="recycling"]["recycling_type"="centre"](around:$radius,$latitude,$longitude);out;''';
 
           final response = await http.get(
             Uri.parse('$overpassUrl?data=${Uri.encodeComponent(query)}'),
