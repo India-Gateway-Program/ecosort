@@ -1,12 +1,13 @@
 import 'package:ecosort/constants/borders.dart';
 import 'package:ecosort/constants/colors.dart';
+import 'package:ecosort/pages/assist_screen.dart';
+import 'package:ecosort/pages/calendar_screen.dart';
 import 'package:ecosort/pages/history_screen.dart';
 import 'package:ecosort/pages/map_screen.dart';
 import 'package:ecosort/pages/scan_screen.dart';
 import 'package:ecosort/widgets/bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 
 void main() {
   runApp(const ProviderScope(
@@ -41,7 +42,9 @@ class _HomePageState extends State<HomePage> {
 
   final List<Widget> _pages = [
     HistoryScreen(),
+    CalendarScreen(),
     MapScreen(),
+    AssistScreen(),
   ];
 
   @override
