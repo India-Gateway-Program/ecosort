@@ -2,7 +2,8 @@ import 'package:ecosort/constants/colors.dart';
 import 'package:ecosort/enums/recyclability.dart';
 import 'package:flutter/material.dart';
 
-import 'RecyclabilityIndicator.dart';
+import 'recyclability_indicator.dart';
+
 
 class HistoryTile extends StatelessWidget {
   final Recyclability recyclability;
