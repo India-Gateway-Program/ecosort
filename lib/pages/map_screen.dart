@@ -21,19 +21,6 @@ class MapScreen extends ConsumerWidget {
     double latitude = 12.9716; // Default latitude
     double longitude = 77.5946; // Default longitude
 
-    locationState.when(
-      data: (locationData) {
-        if (locationData.latitude != null && locationData.longitude != null) {
-          latitude = locationData.latitude!;
-          longitude = locationData.longitude!;
-        }
-      },
-      loading: () {},
-      error: (error, stackTrace) {
-        // TODO: Show an error message
-      },
-    );
-
     return FlutterMap(
       mapController: mapController,
       options: MapOptions(
@@ -62,8 +49,8 @@ class MapScreen extends ConsumerWidget {
                 return Marker(
                   point: LatLng(place.lat, place.lon),
                   child: const Icon(
-                    Icons.recycling,
-                    color: Colors.green,
+                    Icons.location_on,
+                    color: Colors.red,
                   ),
                 );
               }).toList(),
@@ -80,40 +67,46 @@ class MapScreen extends ConsumerWidget {
           bottom: 20,
           right: 20,
           child: FloatingActionButton(
-            backgroundColor: AppColors.primaryColor,
-            onPressed: () async {
-              try {
-                final locationState = await ref.read(locationProvider.future);
-                if (locationState.latitude != null &&
-                    locationState.longitude != null) {
-                  mapController.move(
-                      LatLng(locationState.latitude!, locationState.longitude!),
-                      15);
-                } else {
-                  // TODO: Show an error message
-                }
-              } catch (e) {
-                SchedulerBinding.instance.addPostFrameCallback((_) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(e.toString()),
-                      backgroundColor: Colors.red,
-                      duration: Duration(seconds: 3),
-                    ),
+              backgroundColor: AppColors.primaryColor,
+              onPressed: () async {
+                if (!locationState.isLoading) {
+                  locationState.when(
+                    data: (locationData) {
+                      if (locationData.latitude != null &&
+                          locationData.longitude != null) {
+                        latitude = locationData.latitude!;
+                        longitude = locationData.longitude!;
+                        mapController.move(LatLng(latitude, longitude), 15);
+                      }
+                    },
+                    loading: () {},
+                    error: (error, stackTrace) {
+                      SchedulerBinding.instance.addPostFrameCallback((_) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(error.toString()),
+                            backgroundColor: Colors.red,
+                            duration: Duration(seconds: 3),
+                          ),
+                        );
+                      });
+                    },
                   );
-                });
-              }
-            },
-            child: locationState.when(
-                data: (locationData) =>
-                    const Icon(Icons.my_location, color: Colors.white),
-                loading: () {
-                  return Icon(Icons.location_searching, color: Colors.white);
-                },
-                error: (error, stack) {
-                  return const Icon(Icons.location_disabled, color: Colors.red);
-                }),
-          ),
+                } else {
+                  SchedulerBinding.instance.addPostFrameCallback((_) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text("Location not known yet."),
+                        backgroundColor: AppColors.primaryColor,
+                        duration: Duration(seconds: 3),
+                      ),
+                    );
+                  });
+                }
+              },
+              child: locationState.isLoading
+                  ? Icon(Icons.location_searching, color: Colors.white)
+                  : Icon(Icons.my_location, color: Colors.white)),
         ),
       ],
     );
