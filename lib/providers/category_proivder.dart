@@ -22,7 +22,7 @@ class Category {
 }
 
 Future<List<Category>> fetchCategories() async {
-  const String apiUrl = 'http://192.168.178.234:8000/api/categories/';
+  const String apiUrl = 'http://192.168.2.115:8000/api/categories/';
 
   try {
     final response = await http.get(Uri.parse(apiUrl));
@@ -36,22 +36,6 @@ Future<List<Category>> fetchCategories() async {
     throw Exception('Error: $e');
   }
 }
-
-final filteredCategoriesProvider =
-    FutureProvider.family<List<Category>, String>(
-  (ref, query) async {
-    final allCategories = await ref.watch(categoriesProvider.future);
-
-    if (query.isEmpty) {
-      return allCategories;
-    }
-
-    return allCategories
-        .where((category) =>
-            category.name.toLowerCase().contains(query.toLowerCase()))
-        .toList();
-  },
-);
 
 final categoriesProvider = FutureProvider<List<Category>>((ref) async {
   return await fetchCategories();
