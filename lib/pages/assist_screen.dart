@@ -1,5 +1,6 @@
 import 'package:ecosort/constants/borders.dart';
 import 'package:ecosort/constants/colors.dart';
+import 'package:ecosort/widgets/modal_bottom_shett.dart';
 import 'package:ecosort/widgets/waste_type_badge.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -92,8 +93,22 @@ class _AssistScreenState extends ConsumerState<AssistScreen> {
                   for (final category in filteredCategories)
                     Align(
                       alignment: Alignment.centerLeft,
-                      child: WasteTypeBadge(
-                        title: category.name,
+                      child: GestureDetector(
+                        onTap: () {
+                          showBottomSheet(
+                            context: context,
+                            builder: (context) {
+                              return QuestionModalBottomSheet(
+                                question: "Is the item dirty?",
+                                description:
+                                    "If the item is dirty, it cant be recycled.",
+                              );
+                            },
+                          );
+                        },
+                        child: WasteTypeBadge(
+                          title: category.name,
+                        ),
                       ),
                     ),
                 ],
