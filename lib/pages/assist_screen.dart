@@ -57,12 +57,20 @@ class _AssistScreenState extends ConsumerState<AssistScreen> {
                   query = value;
                 });
               },
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 fillColor: Colors.white,
                 hintText: "Search in database",
-                prefixIcon: Icon(Icons.search, color: Colors.grey),
+                prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                suffixIcon: IconButton(
+                  icon: const Icon(Icons.clear),
+                  onPressed: () {
+                    setState(() {
+                      query = '';
+                    });
+                  },
+                ),
                 filled: true,
-                border: OutlineInputBorder(),
+                border: const OutlineInputBorder(),
               ),
             ),
           ),
