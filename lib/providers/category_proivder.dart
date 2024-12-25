@@ -37,6 +37,22 @@ Future<List<Category>> fetchCategories() async {
   }
 }
 
+final filteredCategoriesProvider =
+    FutureProvider.family<List<Category>, String>(
+  (ref, query) async {
+    final allCategories = await ref.watch(categoriesProvider.future);
+
+    if (query.isEmpty) {
+      return allCategories;
+    }
+
+    return allCategories
+        .where((category) =>
+            category.name.toLowerCase().contains(query.toLowerCase()))
+        .toList();
+  },
+);
+
 final categoriesProvider = FutureProvider<List<Category>>((ref) async {
   return await fetchCategories();
 });
