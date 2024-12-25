@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 
+import '../config.dart';
+
 class Category {
   final int id;
   final String name;
@@ -22,9 +24,9 @@ class Category {
 }
 
 Future<List<Category>> fetchCategories() async {
-  const String apiUrl = 'http://192.168.2.115:8000/api/categories/';
-
   try {
+    const String apiUrl = '${Config.baseUrl}categories/';
+
     final response = await http.get(Uri.parse(apiUrl));
 
     if (response.statusCode == 200) {

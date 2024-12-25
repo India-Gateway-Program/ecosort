@@ -1,11 +1,13 @@
 import 'package:ecosort/constants/borders.dart';
 import 'package:ecosort/constants/colors.dart';
+import 'package:ecosort/pages/scan_result.dart';
 import 'package:ecosort/widgets/modal_bottom_shett.dart';
 import 'package:ecosort/widgets/waste_type_badge.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../providers/category_proivder.dart';
+import '../providers/category_provider.dart';
+import '../providers/question_provider.dart';
 
 class AssistScreen extends ConsumerStatefulWidget {
   const AssistScreen({super.key});
@@ -16,6 +18,11 @@ class AssistScreen extends ConsumerStatefulWidget {
 
 class _AssistScreenState extends ConsumerState<AssistScreen> {
   String query = '';
+
+  Future<Question?> fetchDescription({required int categoryId}) async {
+    final container = ProviderContainer();
+    return await container.read(questionProvider(categoryId).future);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -95,13 +102,41 @@ class _AssistScreenState extends ConsumerState<AssistScreen> {
                       alignment: Alignment.centerLeft,
                       child: GestureDetector(
                         onTap: () {
-                          showBottomSheet(
+                          showModalBottomSheet(
                             context: context,
                             builder: (context) {
-                              return QuestionModalBottomSheet(
-                                question: "Is the item dirty?",
-                                description:
-                                    "If the item is dirty, it cant be recycled.",
+                              return FutureBuilder<Question?>(
+                                future:
+                                    fetchDescription(categoryId: category.id),
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return Center(
+                                        child: CircularProgressIndicator());
+                                  } else if (snapshot.hasError) {
+                                    return Center(
+                                      child: Text("Error loading question"),
+                                    );
+                                  } else if (snapshot.data == null) {
+                                    // No question skip and go directly to result screen
+                                    WidgetsBinding.instance
+                                        .addPostFrameCallback((_) {
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => ScanResult(),
+                                        ),
+                                      );
+                                    });
+                                    return Container();
+                                  } else {
+                                    return QuestionModalBottomSheet(
+                                      question: snapshot.data?.text ?? '',
+                                      description:
+                                          snapshot.data?.description ?? '',
+                                    );
+                                  }
+                                },
                               );
                             },
                           );
