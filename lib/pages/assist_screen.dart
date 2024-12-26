@@ -43,6 +43,8 @@ class _AssistScreenState extends ConsumerState<AssistScreen> {
       loading: () => [],
     );
 
+    Map<int, dynamic> categoryMap = {};
+
     return Column(
       children: [
         Padding(
@@ -98,39 +100,54 @@ class _AssistScreenState extends ConsumerState<AssistScreen> {
                   )
                 else ...[
                   for (final category in filteredCategories)
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: GestureDetector(
-                        onTap: () async {
-                          final question =
-                              await fetchDescription(categoryId: category.id);
-
-                          if (question != null) {
-                            showModalBottomSheet(
-                              context: context,
-                              // TODO: find a better way to show the modal
-                              builder: (context) {
-                                return QuestionModalBottomSheet(
-                                  question: question.text ?? '',
-                                  description: question.description ?? '',
-                                );
-                              },
-                            );
-                          } else {
-                            WidgetsBinding.instance.addPostFrameCallback((_) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => ScanResultScreen()),
+                    FutureBuilder(
+                        future: fetchDescription(categoryId: category.id),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.done) {
+                            if (snapshot.data != null) {
+                              return Align(
+                                alignment: Alignment.centerLeft,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    showModalBottomSheet(
+                                      context: context,
+                                      builder: (context) {
+                                        return QuestionModalBottomSheet(
+                                          question: snapshot.data?.text ?? '',
+                                          description:
+                                              snapshot.data?.description ?? '',
+                                        );
+                                      },
+                                    );
+                                  },
+                                  child: WasteTypeBadge(
+                                    title: category.name,
+                                  ),
+                                ),
                               );
-                            });
+                            } else {
+                              return Align(
+                                alignment: Alignment.centerLeft,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            ScanResultScreen(),
+                                      ),
+                                    );
+                                  },
+                                  child: WasteTypeBadge(
+                                    title: category.name,
+                                  ),
+                                ),
+                              );
+                            }
                           }
-                        },
-                        child: WasteTypeBadge(
-                          title: category.name,
-                        ),
-                      ),
-                    ),
+                          return Container();
+                        })
                 ],
               ],
             ),
