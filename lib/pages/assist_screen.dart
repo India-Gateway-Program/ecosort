@@ -119,15 +119,16 @@ class _AssistScreenState extends ConsumerState<AssistScreen> {
                                     );
                                   } else if (snapshot.data == null) {
                                     // No question skip and go directly to result screen
+
                                     WidgetsBinding.instance
                                         .addPostFrameCallback((_) {
-                                      Navigator.pushReplacement(
+                                      Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) => ScanResult(),
-                                        ),
+                                            builder: (context) => ScanResultScreen()),
                                       );
                                     });
+
                                     return Container();
                                   } else {
                                     return QuestionModalBottomSheet(

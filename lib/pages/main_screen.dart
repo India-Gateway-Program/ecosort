@@ -4,6 +4,7 @@ import 'package:ecosort/pages/assist_screen.dart';
 import 'package:ecosort/pages/calendar_screen.dart';
 import 'package:ecosort/pages/history_screen.dart';
 import 'package:ecosort/pages/map_screen.dart';
+import 'package:ecosort/pages/scan_result.dart';
 import 'package:ecosort/pages/scan_screen.dart';
 import 'package:ecosort/widgets/bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
