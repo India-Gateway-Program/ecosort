@@ -101,46 +101,30 @@ class _AssistScreenState extends ConsumerState<AssistScreen> {
                     Align(
                       alignment: Alignment.centerLeft,
                       child: GestureDetector(
-                        onTap: () {
-                          showModalBottomSheet(
-                            context: context,
-                            builder: (context) {
-                              return FutureBuilder<Question?>(
-                                future:
-                                    fetchDescription(categoryId: category.id),
-                                builder: (context, snapshot) {
-                                  if (snapshot.connectionState ==
-                                      ConnectionState.waiting) {
-                                    return Center(
-                                        child: CircularProgressIndicator());
-                                  } else if (snapshot.hasError) {
-                                    return Center(
-                                      child: Text("Error loading question"),
-                                    );
-                                  } else if (snapshot.data == null) {
-                                    // No question skip and go directly to result screen
+                        onTap: () async {
+                          final question =
+                              await fetchDescription(categoryId: category.id);
 
-                                    WidgetsBinding.instance
-                                        .addPostFrameCallback((_) {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => ScanResultScreen()),
-                                      );
-                                    });
-
-                                    return Container();
-                                  } else {
-                                    return QuestionModalBottomSheet(
-                                      question: snapshot.data?.text ?? '',
-                                      description:
-                                          snapshot.data?.description ?? '',
-                                    );
-                                  }
-                                },
+                          if (question != null) {
+                            showModalBottomSheet(
+                              context: context,
+                              // TODO: find a better way to show the modal
+                              builder: (context) {
+                                return QuestionModalBottomSheet(
+                                  question: question.text ?? '',
+                                  description: question.description ?? '',
+                                );
+                              },
+                            );
+                          } else {
+                            WidgetsBinding.instance.addPostFrameCallback((_) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => ScanResultScreen()),
                               );
-                            },
-                          );
+                            });
+                          }
                         },
                         child: WasteTypeBadge(
                           title: category.name,
