@@ -43,8 +43,6 @@ class _AssistScreenState extends ConsumerState<AssistScreen> {
       loading: () => [],
     );
 
-    Map<int, dynamic> categoryMap = {};
-
     return Column(
       children: [
         Padding(
@@ -134,8 +132,10 @@ class _AssistScreenState extends ConsumerState<AssistScreen> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) =>
-                                            ScanResultScreen(),
+                                        builder: (context) => ScanResultScreen(
+                                          categoryId: category.id,
+                                          categoryName: category.name,
+                                        ),
                                       ),
                                     );
                                   },
