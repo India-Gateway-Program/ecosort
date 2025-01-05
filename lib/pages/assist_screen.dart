@@ -17,11 +17,18 @@ class AssistScreen extends ConsumerStatefulWidget {
 }
 
 class _AssistScreenState extends ConsumerState<AssistScreen> {
+  final TextEditingController _controller = TextEditingController();
   String query = '';
 
   Future<Question?> fetchDescription({required int categoryId}) async {
     final container = ProviderContainer();
     return await container.read(questionProvider(categoryId).future);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -60,6 +67,7 @@ class _AssistScreenState extends ConsumerState<AssistScreen> {
               ],
             ),
             child: TextField(
+              controller: _controller,
               onChanged: (value) {
                 setState(() {
                   query = value;
@@ -74,6 +82,7 @@ class _AssistScreenState extends ConsumerState<AssistScreen> {
                   onPressed: () {
                     setState(() {
                       query = '';
+                      _controller.clear();
                     });
                   },
                 ),
