@@ -9,32 +9,27 @@ class ScanScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return CameraAwesomeBuilder.custom(
+      sensorConfig: SensorConfig.single(SensorPosition.back), // Added this
       enablePhysicalButton: true,
       builder: (CameraState state, Preview preview) {
         return Stack(
           children: [
+            Positioned.fill(child: preview), // Ensure camera preview is visible
             Positioned(
               bottom: 30,
               left: 30,
               right: 30,
               child: ElevatedButton(
                 onPressed: () async {
-                  try {
-                    state.when(
-                      onPhotoMode: (photoCameraState) async {
-                        final file = await photoCameraState.takePhoto();
-                      },
-                    );
-                  } catch (e) {
-                    SchedulerBinding.instance.addPostFrameCallback((_) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(e.toString()),
-                          backgroundColor: Colors.red,
-                          duration: Duration(seconds: 3),
-                        ),
-                      );
-                    });
+                  if (state is PhotoCameraState) {
+                    try {
+                      final file = await (state as PhotoCameraState).takePhoto();
+                      print("Photo saved: ${file.path}");
+                    } catch (e) {
+                      showError(context, e.toString());
+                    }
+                  } else {
+                    showError(context, "Camera is not in photo mode!");
                   }
                 },
                 style: ElevatedButton.styleFrom(
@@ -55,4 +50,16 @@ class ScanScreen extends ConsumerWidget {
       saveConfig: SaveConfig.photo(),
     );
   }
+}
+
+void showError(BuildContext context, String message) {
+  SchedulerBinding.instance.addPostFrameCallback((_) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+        duration: Duration(seconds: 3),
+      ),
+    );
+  });
 }
