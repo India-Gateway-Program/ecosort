@@ -97,3 +97,10 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+assets:
+  assets/images/logo1.png
+  - assets/images/aishwarya_dhaul.jpg
+  - assets/images/nishtha_jain.jpg
+  - assets/images/florian_jafar_sabonchi.jpg
+  - assets/images/silas_germer.jpg
+  - assets/images/ceyanne_dsouza.jpg

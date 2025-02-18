@@ -4,7 +4,6 @@ import 'package:ecosort/pages/assist_screen.dart';
 import 'package:ecosort/pages/calendar_screen.dart';
 import 'package:ecosort/pages/history_screen.dart';
 import 'package:ecosort/pages/map_screen.dart';
-import 'package:ecosort/pages/scan_result.dart';
 import 'package:ecosort/pages/scan_screen.dart';
 import 'package:ecosort/widgets/bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
@@ -62,30 +61,32 @@ class _HomePageState extends State<HomePage> {
       ),
       floatingActionButton: _selectedIndex == 0
           ? Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton.icon(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => ScanScreen()),
-                    );
-                  },
-                  icon: const Icon(
-                    Icons.qr_code_scanner,
-                    color: Colors.white,
-                  ),
-                  label: Text("Scan", style: TextStyle(color: Colors.white)),
-                  style: TextButton.styleFrom(
-                    backgroundColor: AppColors.primaryColor,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: AppBorders.small,
-                    ),
-                    padding: const EdgeInsets.all(15),
-                  ),
-                )
-              ],
-            )
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          TextButton.icon(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ScanScreen()),
+              ).then((_) {
+                // Optionally handle any actions after returning from ScanScreen
+              });
+            },
+            icon: const Icon(
+              Icons.qr_code_scanner,
+              color: Colors.white,
+            ),
+            label: Text("Scan", style: TextStyle(color: Colors.white)),
+            style: TextButton.styleFrom(
+              backgroundColor: AppColors.primaryColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: AppBorders.small,
+              ),
+              padding: const EdgeInsets.all(15),
+            ),
+          )
+        ],
+      )
           : null,
     );
   }
