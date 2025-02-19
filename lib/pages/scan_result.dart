@@ -24,6 +24,7 @@ class _ScanResultState extends ConsumerState<ScanResultScreen> {
     2: 'assets/images/recovered_paper.jpg',
     5: 'assets/images/old_glass.jpg',
     1: 'assets/images/residential_waste.jpg',
+    6: 'assets/images/plastic-waste-recycling.jpg'
   };
 
   @override

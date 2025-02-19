@@ -19,14 +19,16 @@ class BottomNavBar extends StatelessWidget {
           icon: Icon(Icons.history),
           label: 'History',
         ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.calendar_month),
-          label: 'Calendar',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.map),
-          label: 'Map',
-        ),
+        // BottomNavigationBarItem(
+        //  icon: Icon(Icons.calendar_month),
+        //  label: 'Calendar',
+        //),
+        // BottomNavigationBarItem(
+        //  icon: Icon(Icons.map),
+        //  label: 'Map',
+        //),
+        BottomNavigationBarItem(icon: Icon(Icons.camera_alt), label: 'Scan'),
+
         BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Assist'),
       ],
       currentIndex: selectedIndex,

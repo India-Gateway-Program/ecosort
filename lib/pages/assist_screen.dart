@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/category_provider.dart';
-import '../providers/question_provider.dart';
+import '../providers/question_answer_provider.dart';
 
 class AssistScreen extends ConsumerStatefulWidget {
   const AssistScreen({super.key});
@@ -19,11 +19,6 @@ class AssistScreen extends ConsumerStatefulWidget {
 class _AssistScreenState extends ConsumerState<AssistScreen> {
   final TextEditingController _controller = TextEditingController();
   String query = '';
-
-  Future<Question?> fetchDescription({required int categoryId}) async {
-    final container = ProviderContainer();
-    return await container.read(questionProvider(categoryId).future);
-  }
 
   @override
   void dispose() {
@@ -108,7 +103,7 @@ class _AssistScreenState extends ConsumerState<AssistScreen> {
                 else ...[
                   for (final category in filteredCategories)
                     FutureBuilder(
-                        future: fetchDescription(categoryId: category.id),
+                        future: fetchQuestion(categoryId: category.id),
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.done) {
