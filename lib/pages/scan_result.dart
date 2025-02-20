@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:locale_switcher/locale_switcher.dart';
 
 import '../providers/disposal_provider.dart';
 
@@ -27,6 +28,8 @@ class _ScanResultState extends ConsumerState<ScanResultScreen> {
     6: 'assets/images/plastic-waste-recycling.jpg'
   };
 
+  Locale? locale = Locale("de");
+
   @override
   Widget build(BuildContext context) {
     Future<DisposalRule?> fetchDisposalRule(WidgetRef ref,
@@ -41,6 +44,16 @@ class _ScanResultState extends ConsumerState<ScanResultScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        actions: [
+          LocaleSwitcher.iconButton(
+            title: "Select your country",
+            setLocaleCallBack: (context) => {
+              setState(() {
+                locale = LocaleSwitcher.current.locale;
+              })
+            },
+          ),
+        ],
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -49,7 +62,9 @@ class _ScanResultState extends ConsumerState<ScanResultScreen> {
         ),
       ),
       body: FutureBuilder(
-        future: fetchDisposalRule(ref, categoryId: widget.categoryId),
+        future: fetchDisposalRule(ref,
+            categoryId: widget.categoryId,
+            materialConditionID: widget.materialConditionId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -63,7 +78,7 @@ class _ScanResultState extends ConsumerState<ScanResultScreen> {
             return const Center(child: Text('No data available.'));
           }
 
-          var data = snapshot.data;
+          DisposalRule? data = snapshot.data;
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -113,7 +128,9 @@ class _ScanResultState extends ConsumerState<ScanResultScreen> {
                               ),
                             ),
                             Text(
-                              data.description,
+                              locale?.languageCode == "de"
+                                  ? data.descriptionDE
+                                  : data.descriptionIN,
                               style: const TextStyle(
                                 fontSize: 20,
                                 color: Colors.grey,

@@ -6,16 +6,21 @@ import '../config.dart';
 
 class DisposalRule {
   final String disposalMethod;
-  final String description;
+  final String descriptionDE;
+  final String descriptionIN;
   final int id;
 
   DisposalRule(
-      {required this.disposalMethod, required this.id, this.description = ''});
+      {required this.disposalMethod,
+      required this.id,
+      this.descriptionDE = '',
+      this.descriptionIN = ''});
 
   factory DisposalRule.fromJson(Map<String, dynamic> json) {
     return DisposalRule(
       disposalMethod: json['disposal_method'] as String,
-      description: json['description'] as String,
+      descriptionDE: json['description_de'] as String,
+      descriptionIN: json['description_in'] as String,
       id: json['id'] as int,
     );
   }

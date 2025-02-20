@@ -48,7 +48,7 @@ class _AssistScreenState extends ConsumerState<AssistScreen> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.only(top: 100, left: 25, right: 25),
+          padding: const EdgeInsets.only(top: 10, left: 25, right: 25),
           child: Container(
             decoration: BoxDecoration(
               color: Colors.white,
@@ -116,9 +116,11 @@ class _AssistScreenState extends ConsumerState<AssistScreen> {
                                       context: context,
                                       builder: (context) {
                                         return QuestionModalBottomSheet(
+                                          categoryId: category.id,
                                           question: snapshot.data?.text ?? '',
                                           description:
                                               snapshot.data?.description ?? '',
+                                          categoryName: category.name,
                                         );
                                       },
                                     );

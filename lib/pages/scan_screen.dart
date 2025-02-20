@@ -103,9 +103,11 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
                                     context: context,
                                     builder: (context) {
                                       return QuestionModalBottomSheet(
+                                        categoryName: jsonMap['category'],
+                                        categoryId: detectedCategoryId,
                                         question: fetchedQuestions.text ?? '',
                                         description:
-                                           fetchedQuestions.description ?? '',
+                                            fetchedQuestions.description ?? '',
                                       );
                                     },
                                   );

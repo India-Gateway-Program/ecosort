@@ -1,13 +1,20 @@
 import 'package:ecosort/constants/colors.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
+import '../pages/scan_result.dart';
 
 class QuestionModalBottomSheet extends StatelessWidget {
   final String question;
   final String description;
+  final int categoryId;
+  final String categoryName;
 
   const QuestionModalBottomSheet(
-      {super.key, required this.question, required this.description});
+      {super.key,
+      required this.question,
+      required this.description,
+      required this.categoryId,
+      required this.categoryName});
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +46,17 @@ class QuestionModalBottomSheet extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ScanResultScreen(
+                          materialConditionId: 2,
+                          categoryId: categoryId,
+                          categoryName: categoryName,
+                        ),
+                      ));
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primaryColor,
                 ),
@@ -47,7 +64,17 @@ class QuestionModalBottomSheet extends StatelessWidget {
               ),
               SizedBox(width: 16),
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ScanResultScreen(
+                          materialConditionId: 1,
+                          categoryId: categoryId,
+                          categoryName: categoryName,
+                        ),
+                      ));
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,
                 ),
